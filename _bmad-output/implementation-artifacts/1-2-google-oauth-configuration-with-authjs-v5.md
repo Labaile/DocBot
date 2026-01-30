@@ -1,6 +1,6 @@
 # Story 1.2: Google OAuth Configuration with Auth.js (v5)
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
