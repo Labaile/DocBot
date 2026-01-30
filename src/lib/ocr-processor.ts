@@ -5,7 +5,10 @@ export interface ExtractedBillData {
   amount: string;
   dueDate: string;
   rawText: string;
+  confidence: number;
 }
+
+const CONFIDENCE_THRESHOLD = 70;
 
 /**
  * Processes an image buffer and extracts bill-related information.
@@ -14,13 +17,34 @@ export interface ExtractedBillData {
 export async function extractBillData(imageBuffer: Buffer): Promise<ExtractedBillData> {
   const worker = await createWorker('eng');
 
-  const { data: { text } } = await worker.recognize(imageBuffer);
-  await worker.terminate();
+  try {
+    const { data: { text, confidence } } = await worker.recognize(imageBuffer);
 
-  return parseBillText(text);
+    if (confidence < CONFIDENCE_THRESHOLD) {
+      const error: any = new Error('Confidence below threshold');
+      error.code = 'ERR_LOW_CONFIDENCE';
+      throw error;
+    }
+
+    const result = parseBillText(text);
+
+    // AC 3.2.5: Treat missing critical fields as low confidence failure
+    if (result.amount === 'Unknown' || result.dueDate === 'Unknown') {
+      const error: any = new Error('Critical fields missing or unreadable');
+      error.code = 'ERR_LOW_CONFIDENCE';
+      throw error;
+    }
+
+    return {
+      ...result,
+      confidence
+    };
+  } finally {
+    await worker.terminate();
+  }
 }
 
-function parseBillText(text: string): ExtractedBillData {
+function parseBillText(text: string): Omit<ExtractedBillData, 'confidence'> {
   const lines = text.split('\n');
 
   // Basic patterns (to be refined in Epic 3.2)

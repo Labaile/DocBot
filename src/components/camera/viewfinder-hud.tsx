@@ -5,15 +5,25 @@ const geistMono = Geist_Mono({
 });
 
 interface ViewfinderHUDProps {
-  status?: "searching" | "locked" | "capturing" | "processing";
+  status?: "searching" | "locked" | "capturing" | "processing" | "retry";
   videoRef?: React.RefObject<HTMLVideoElement | null>;
 }
 
 export function ViewfinderHUD({ status = "searching", videoRef }: ViewfinderHUDProps) {
   const isLocked = status === "locked" || status === "processing";
   const isProcessing = status === "processing";
-  const accentColor = isLocked ? "border-electric-emerald shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "border-white/40 shadow-none";
-  const textColor = isLocked ? "text-electric-emerald" : "text-white/40";
+  const isRetry = status === "retry";
+  
+  let accentColor = "border-white/40 shadow-none";
+  let textColor = "text-white/40";
+
+  if (isLocked) {
+    accentColor = "border-electric-emerald shadow-[0_0_15px_rgba(16,185,129,0.3)]";
+    textColor = "text-electric-emerald";
+  } else if (isRetry) {
+    accentColor = "border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.3)]";
+    textColor = "text-orange-500";
+  }
 
   return (
     <div className={`relative aspect-[3/4] w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-black backdrop-blur-xl transition-all duration-500 ${geistMono.className}`}>
@@ -59,9 +69,9 @@ export function ViewfinderHUD({ status = "searching", videoRef }: ViewfinderHUDP
 
       <div className="absolute top-12 right-12 flex flex-col items-end gap-1 z-20">
         <div className="flex items-center gap-1.5">
-          <span className={`w-1.5 h-1.5 rounded-full ${isProcessing ? 'bg-orange-400 animate-ping' : isLocked ? 'bg-electric-emerald' : 'bg-white/20 animate-pulse'}`} />
-          <span className={`text-[10px] uppercase tracking-[0.2em] transition-colors ${isProcessing ? 'text-orange-400' : textColor}`}>
-            {isProcessing ? "ANALYZING_DOC" : isLocked ? "DOC_LOCKED" : "READY_SCAN"}
+          <span className={`w-1.5 h-1.5 rounded-full ${isProcessing ? 'bg-orange-400 animate-ping' : isRetry ? 'bg-orange-500' : isLocked ? 'bg-electric-emerald' : 'bg-white/20 animate-pulse'}`} />
+          <span className={`text-[10px] uppercase tracking-[0.2em] transition-colors ${isProcessing || isRetry ? 'text-orange-400' : textColor}`}>
+            {isProcessing ? "ANALYZING_DOC" : isRetry ? "VISION_LOW" : isLocked ? "DOC_LOCKED" : "READY_SCAN"}
           </span>
         </div>
         <span className="text-[10px] uppercase tracking-[0.2em] text-white/20">RES: 4K_RAW</span>
@@ -69,9 +79,9 @@ export function ViewfinderHUD({ status = "searching", videoRef }: ViewfinderHUDP
 
       {/* Scanning HUD Footer */}
       <div className="absolute bottom-12 left-0 right-0 px-12 text-center z-20">
-        <div className={`h-px w-full transition-colors duration-500 ${isProcessing ? "bg-orange-400/30" : isLocked ? "bg-electric-emerald/30" : "bg-white/10"} mb-4`} />
-        <p className={`text-[10px] uppercase tracking-[0.3em] leading-relaxed transition-colors ${isProcessing ? 'text-orange-400' : 'text-white/40'}`}>
-          {isProcessing ? "Extracting intelligence..." : isLocked ? "Stable - Capture Enabled" : "Align document within frame"}
+        <div className={`h-px w-full transition-colors duration-500 ${isProcessing || isRetry ? "bg-orange-400/30" : isLocked ? "bg-electric-emerald/30" : "bg-white/10"} mb-4`} />
+        <p className={`text-[10px] uppercase tracking-[0.3em] leading-relaxed transition-colors ${isProcessing || isRetry ? 'text-orange-400' : 'text-white/40'}`}>
+          {isProcessing ? "Extracting intelligence..." : isRetry ? "Blur detected - please retry" : isLocked ? "Stable - Capture Enabled" : "Align document within frame"}
         </p>
       </div>
 

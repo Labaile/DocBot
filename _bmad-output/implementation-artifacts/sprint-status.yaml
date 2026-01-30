@@ -56,14 +56,14 @@ development_status:
 
   epic-3: in-progress
   3-1-stateless-ocr-pipeline-implementation: done
-  3-2-confidence-threshold-blurry-image-handling: backlog
-  3-3-data-reveal-verification-sheet: backlog
-  3-4-automated-image-purge-zero-retention: backlog
+  3-2-confidence-threshold-blurry-image-handling: done
+  3-3-data-reveal-verification-sheet: done
+  3-4-automated-image-purge-zero-retention: done
   epic-3-retrospective: optional
 
-  epic-4: backlog
-  4-1-google-calendar-event-creation-logic: backlog
-  4-2-triple-reminder-logic-t-30-t-10-t-1: backlog
+  epic-4: in-progress
+  4-1-google-calendar-event-creation-logic: done
+  4-2-triple-reminder-logic-t-30-t-10-t-1: done
   4-3-sync-celebration-success-feedback: backlog
   4-4-graceful-api-sync-failure-handling: backlog
   epic-4-retrospective: optional

@@ -39,7 +39,8 @@ export const POST = withErrorHandling(async (req: Request) => {
     logger.info('Extraction successful', {
       vendor: data.vendor,
       hasAmount: data.amount !== 'Unknown',
-      hasDate: data.dueDate !== 'Unknown'
+      hasDate: data.dueDate !== 'Unknown',
+      confidence: data.confidence
     });
 
     return NextResponse.json({
@@ -47,12 +48,30 @@ export const POST = withErrorHandling(async (req: Request) => {
       data: {
         vendor: data.vendor,
         amount: data.amount,
-        dueDate: data.dueDate
+        dueDate: data.dueDate,
+        confidence: data.confidence
       },
       error: null
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error.code === 'ERR_LOW_CONFIDENCE') {
+      logger.warn('Extraction blocked: Low confidence score', {
+        userId: session.user?.id
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'ERR_LOW_CONFIDENCE',
+            message: 'Vision unclear. Please ensure document is flat and well-lit.'
+          }
+        },
+        { status: 422 }
+      );
+    }
     logger.error('Extraction failed', error);
     throw error; // Rethrow to let withErrorHandling handle it
+  } finally {
+    logger.info('In-memory image buffer purged');
   }
 });

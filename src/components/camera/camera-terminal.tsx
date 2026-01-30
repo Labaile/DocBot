@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useCamera } from "@/hooks/use-camera";
 import { ViewfinderHUD } from "./viewfinder-hud";
+import { DataRevealSheet } from "./data-reveal-sheet";
 import { Camera, FileUp, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,8 +19,10 @@ export function CameraTerminal() {
   } = useCamera();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [status, setStatus] = useState<"searching" | "locked" | "capturing" | "processing">("searching");
+  const [status, setStatus] = useState<"searching" | "locked" | "capturing" | "processing" | "retry">("searching");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showRevealSheet, setShowRevealSheet] = useState(false);
+  const [extractedData, setExtractedData] = useState({ vendor: "", amount: "", dueDate: "" });
 
   useEffect(() => {
     startStream();
@@ -42,12 +45,23 @@ export function CameraTerminal() {
       const result = await response.json();
 
       if (result.success) {
+        setExtractedData(result.data);
+        setShowRevealSheet(true);
+        setStatus("locked");
         toast.success("Analysis Complete", {
-          description: `Detected: ${result.data.vendor} - ${result.data.amount}`,
+          description: "Verify your bill details below.",
           icon: <CheckCircle2 className="text-electric-emerald" />
         });
-        console.log("Extraction Results:", result.data);
       } else {
+        if (result.error?.code === 'ERR_LOW_CONFIDENCE') {
+          setStatus("retry");
+          toast.warning("Vision Unclear", {
+            description: result.error.message,
+            icon: <AlertCircle className="text-orange-500" />,
+            duration: 5000
+          });
+          return;
+        }
         throw new Error(result.error?.message || "Extraction failed");
       }
     } catch (err) {
@@ -55,8 +69,47 @@ export function CameraTerminal() {
       toast.error("Analysis Failed", {
         description: err instanceof Error ? err.message : "An unexpected error occurred."
       });
+      setStatus("searching");
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleConfirm = async (finalData: typeof extractedData) => {
+    setShowRevealSheet(false);
+    setStatus("processing");
+    
+    toast.info("Scheduling...", {
+      description: `Syncing ${finalData.vendor} to Google Calendar.`
+    });
+
+    try {
+      const response = await fetch("/api/calendar/sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(finalData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("Synced to Calendar!", {
+          description: `${finalData.vendor} bill reminder added successfully.`,
+          icon: <CheckCircle2 className="text-electric-emerald" />,
+          duration: 5000
+        });
+        setStatus("searching");
+      } else {
+        throw new Error(result.error?.message || "Sync failed");
+      }
+    } catch (err) {
+      console.error("Calendar Sync Error:", err);
+      toast.error("Sync Failed", {
+        description: err instanceof Error ? err.message : "Could not connect to Google Calendar.",
+        icon: <AlertCircle className="text-red-500" />
+      });
       setStatus("searching");
     }
   };
@@ -155,6 +208,16 @@ export function CameraTerminal() {
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40 group-hover:text-white transition-colors">Import Docs</span>
         </button>
       </div>
+
+      <DataRevealSheet 
+        isOpen={showRevealSheet} 
+        onClose={() => {
+          setShowRevealSheet(false);
+          setStatus("searching");
+        }}
+        data={extractedData}
+        onConfirm={handleConfirm}
+      />
     </div>
   );
 }
