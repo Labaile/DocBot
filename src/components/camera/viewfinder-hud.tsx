@@ -6,15 +6,26 @@ const geistMono = Geist_Mono({
 
 interface ViewfinderHUDProps {
   status?: "searching" | "locked" | "capturing";
+  videoRef?: React.RefObject<HTMLVideoElement | null>;
 }
 
-export function ViewfinderHUD({ status = "searching" }: ViewfinderHUDProps) {
+export function ViewfinderHUD({ status = "searching", videoRef }: ViewfinderHUDProps) {
   const isLocked = status === "locked";
   const accentColor = isLocked ? "border-electric-emerald shadow-[0_0_15px_rgba(16,185,129,0.3)]" : "border-white/40 shadow-none";
   const textColor = isLocked ? "text-electric-emerald" : "text-white/40";
 
   return (
-    <div className={`relative aspect-[3/4] w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl ${geistMono.className}`}>
+    <div className={`relative aspect-[3/4] w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-black backdrop-blur-xl ${geistMono.className}`}>
+      {/* Live Video Feed */}
+      {videoRef && (
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="absolute inset-0 h-full w-full object-cover opacity-60"
+        />
+      )}
       {/* Corner Markers */}
       <div className={`absolute top-6 left-6 h-8 w-8 border-t-2 border-l-2 transition-colors duration-500 ${accentColor}`} />
       <div className={`absolute top-6 right-6 h-8 w-8 border-t-2 border-r-2 transition-colors duration-500 ${accentColor}`} />
