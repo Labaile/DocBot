@@ -18,7 +18,7 @@ export function CameraTerminal() {
   } = useCamera();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [status, setStatus] = useState<"searching" | "locked" | "capturing">("searching");
+  const [status, setStatus] = useState<"searching" | "locked" | "capturing" | "processing">("searching");
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
@@ -28,6 +28,7 @@ export function CameraTerminal() {
 
   const processIngestion = (blob: Blob) => {
     setIsProcessing(true);
+    setStatus("processing");
     toast.success("Image Ingested", {
       description: "Processing document intelligence...",
       icon: <CheckCircle2 className="text-electric-emerald" />
@@ -40,7 +41,7 @@ export function CameraTerminal() {
     setTimeout(() => {
       setIsProcessing(false);
       setStatus("searching");
-    }, 2000);
+    }, 3000);
   };
 
   const handleCapture = async () => {
