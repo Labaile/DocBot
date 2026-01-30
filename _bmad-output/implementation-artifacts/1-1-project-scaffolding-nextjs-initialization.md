@@ -1,6 +1,6 @@
 # Story 1.1: Project Scaffolding & Next.js Initialization
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -20,19 +20,19 @@ so that I have a consistent, modern foundation for building DocBot.
 
 ## Tasks / Subtasks
 
-- [ ] Run initialization command (AC: 1, 2)
-  - [ ] Execute `npx -y create-next-app@latest ./ --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --yes`
-- [ ] Install Core Dependencies (AC: 4, 5)
-  - [ ] Execute `npm install geist lucide-react sonner`
-- [ ] Implement Directory Structure (AC: 5)
-  - [ ] Create `src/components/`, `src/app/`, `src/lib/`, `src/hooks/` folders
-- [ ] Configure Design System (AC: 3, 4)
-  - [ ] Update `tailwind.config.ts` with color tokens: `electric-emerald: "#10B981"`, `deep-slate: "#0F172A"`.
-  - [ ] Update `src/app/layout.tsx` to integrate Geist Sans and Mono fonts.
-  - [ ] Set "Deep Slate" as default background in `src/app/globals.css`.
-- [ ] Verification & Version Control (AC: 6, 7)
-  - [ ] Run `npm run build` and ensure zero errors.
-  - [ ] Run `git init && git add . && git commit -m "chore: initial project scaffold with docbot design system foundations"`
+- [x] Run initialization command (AC: 1, 2)
+  - [x] Execute `npx -y create-next-app@latest ./ --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm --yes`
+- [x] Install Core Dependencies (AC: 4, 5)
+  - [x] Execute `npm install geist lucide-react sonner`
+- [x] Implement Directory Structure (AC: 5)
+  - [x] Create `src/components/`, `src/app/`, `src/lib/`, `src/hooks/` folders
+- [x] Configure Design System (AC: 3, 4)
+  - [x] Update `tailwind.config.ts` with color tokens: `electric-emerald: "#10B981"`, `deep-slate: "#0F172A"`.
+  - [x] Update `src/app/layout.tsx` to integrate Geist Sans and Mono fonts.
+  - [x] Set "Deep Slate" as default background in `src/app/globals.css`.
+- [x] Verification & Version Control (AC: 6, 7)
+  - [x] Run `npm run build` and ensure zero errors.
+  - [x] Run `git init && git add . && git commit -m "chore: initial project scaffold with docbot design system foundations"`
 
 ## Dev Notes
 
@@ -57,10 +57,26 @@ so that I have a consistent, modern foundation for building DocBot.
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+BMad Master (powered by Antigravity)
 
 ### Debug Log References
 
+- Verified Node environment in WSL (v22.20.0 success after initial v18 failure).
+- Resolved NPM UNC path failure via direct WSL execution for `create-next-app`.
+- Successfully patched `globals.css` with Tailwind v4 `@theme` tokens.
+
 ### Completion Notes List
 
+- Project scaffolded with Next.js 15+ (App Router).
+- Design system tokens initialized for "Digital Lens" theme (Deep Slate / Emerald).
+- Core folders structure created: `components`, `lib`, `hooks`.
+- Build verified successful.
+
 ### File List
+
+- `src/app/globals.css`
+- `src/app/layout.tsx`
+- `package.json`
+- `src/components/`
+- `src/lib/`
+- `src/hooks/`

@@ -1,0 +1,9 @@
+{
+  "css.customData": [],
+  "stylelint.validate": [
+    "css",
+    "scss",
+    "postcss"
+  ],
+  "css.lint.unknownAtRules": "ignore"
+}

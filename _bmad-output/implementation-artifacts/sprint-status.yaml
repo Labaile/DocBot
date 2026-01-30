@@ -41,7 +41,7 @@ story_location: c:\Users\hello\Documents\DocBot\_bmad-output\implementation-arti
 
 development_status:
   epic-1: in-progress
-  1-1-project-scaffolding-nextjs-initialization: ready-for-dev
+  1-1-project-scaffolding-nextjs-initialization: review
   1-2-google-oauth-configuration-with-authjs-v5: backlog
   1-3-google-calendar-scope-authorization: backlog
   1-4-error-logging-reliability-foundation: backlog
