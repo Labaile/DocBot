@@ -1,6 +1,6 @@
 # Story 1.1: Project Scaffolding & Next.js Initialization
 
-Status: review
+Status: done
 
 ## Story
 

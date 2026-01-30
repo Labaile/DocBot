@@ -1,6 +1,10 @@
-import { Zap } from "lucide-react";
+import { Zap, UserCircle } from "lucide-react";
+import { auth } from "@/auth";
+import { SignIn, SignOut } from "@/components/auth-components";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-deep-slate text-white font-sans selection:bg-electric-emerald/30">
       <main className="relative flex flex-col items-center gap-8 p-8 md:p-24 overflow-hidden">
@@ -22,13 +26,39 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-8">
-          <button className="h-12 px-8 rounded-full bg-electric-emerald text-deep-slate font-bold hover:bg-electric-emerald/90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-electric-emerald/20">
-            Get Started
-          </button>
-          <button className="h-12 px-8 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-all backdrop-blur-sm">
-            Architecture
-          </button>
+        <div className="flex flex-col sm:flex-row gap-4 mt-8 items-center">
+          {session?.user ? (
+            <div className="flex flex-col items-center gap-6">
+              <div className="flex items-center gap-3 p-3 pl-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                {session.user.image ? (
+                  <img 
+                    src={session.user.image} 
+                    alt={session.user.name || "User"} 
+                    className="w-10 h-10 rounded-full border border-electric-emerald/50"
+                  />
+                ) : (
+                  <UserCircle size={40} className="text-white/40" />
+                )}
+                <div className="flex flex-col items-start pr-4">
+                  <span className="text-sm font-semibold">{session.user.name}</span>
+                  <span className="text-xs text-white/40">{session.user.email}</span>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <button className="h-12 px-8 rounded-full bg-electric-emerald text-deep-slate font-bold hover:bg-electric-emerald/90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-electric-emerald/20">
+                  Launch HUD
+                </button>
+                <SignOut />
+              </div>
+            </div>
+          ) : (
+            <>
+              <SignIn provider="google" />
+              <button className="h-12 px-8 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-all backdrop-blur-sm">
+                Architecture
+              </button>
+            </>
+          )}
         </div>
 
         <div className="mt-16 flex items-center gap-2 text-xs font-mono text-white/30 uppercase tracking-[0.2em]">
