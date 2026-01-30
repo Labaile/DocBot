@@ -50,7 +50,7 @@ development_status:
   epic-2: backlog
   2-1-live-viewfinder-ui-hud-implementation: done
   2-2-native-camera-capture-logic: done
-  2-3-system-file-ingestion-fallback: backlog
+  2-3-system-file-ingestion-fallback: done
   2-4-active-processing-visual-state-emerald-scanline: backlog
   epic-2-retrospective: optional
 

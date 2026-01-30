@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useCamera } from "@/hooks/use-camera";
 import { ViewfinderHUD } from "./viewfinder-hud";
 import { Camera, FileUp, AlertCircle, CheckCircle2 } from "lucide-react";
@@ -17,6 +17,7 @@ export function CameraTerminal() {
     captureFrame 
   } = useCamera();
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"searching" | "locked" | "capturing">("searching");
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -25,30 +26,47 @@ export function CameraTerminal() {
     return () => stopStream();
   }, [startStream, stopStream]);
 
+  const processIngestion = (blob: Blob) => {
+    setIsProcessing(true);
+    toast.success("Image Ingested", {
+      description: "Processing document intelligence...",
+      icon: <CheckCircle2 className="text-electric-emerald" />
+    });
+    
+    // Story 3.1 placeholder: Send to OCR
+    console.log("Ingested Storage Blob:", blob);
+    
+    // Simulate processing
+    setTimeout(() => {
+      setIsProcessing(false);
+      setStatus("searching");
+    }, 2000);
+  };
+
   const handleCapture = async () => {
     setStatus("capturing");
     const imageBlob = await captureFrame();
     
     if (imageBlob) {
-      setIsProcessing(true);
-      toast.success("Image Captured", {
-        description: "Processing document intelligence...",
-        icon: <CheckCircle2 className="text-electric-emerald" />
-      });
-      
-      // Story 3.1 placeholder: Send to OCR
-      console.log("Captured Image Blob:", imageBlob);
-      
-      // Simulate processing
-      setTimeout(() => {
-        setIsProcessing(false);
-        setStatus("searching");
-      }, 2000);
+      processIngestion(imageBlob);
     } else {
       toast.error("Capture Failed", {
         description: "Please ensure camera permissions are granted."
       });
       setStatus("searching");
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Invalid File Type", {
+          description: "Please select an image file (JPG, PNG)."
+        });
+        return;
+      }
+      processIngestion(file as Blob);
     }
   };
 
@@ -75,6 +93,13 @@ export function CameraTerminal() {
       <div className="relative w-full group">
         <ViewfinderHUD status={status} videoRef={videoRef} />
         <canvas ref={canvasRef} className="hidden" />
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          className="hidden" 
+          accept="image/*"
+          onChange={handleFileChange}
+        />
         
         {/* Capture Trigger */}
         <div className="absolute -bottom-12 left-1/2 -translate-x-1/2">
@@ -101,7 +126,11 @@ export function CameraTerminal() {
           <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">{status === "locked" ? "Unlock" : "Lock Lens"}</span>
         </button>
 
-        <button className="flex flex-col items-center justify-center gap-3 p-6 rounded-[2.5rem] bg-white/[0.03] border border-white/5 hover:bg-white/5 hover:border-white/10 transition-all group backdrop-blur-sm">
+        <button 
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isProcessing}
+          className="flex flex-col items-center justify-center gap-3 p-6 rounded-[2.5rem] bg-white/[0.03] border border-white/5 hover:bg-white/5 hover:border-white/10 transition-all group backdrop-blur-sm disabled:opacity-50"
+        >
           <div className="p-4 rounded-2xl bg-white/5 text-white/60 group-hover:scale-110 transition-transform">
             <FileUp size={24} strokeWidth={1.5} />
           </div>
