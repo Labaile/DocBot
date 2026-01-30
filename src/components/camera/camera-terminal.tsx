@@ -26,22 +26,39 @@ export function CameraTerminal() {
     return () => stopStream();
   }, [startStream, stopStream]);
 
-  const processIngestion = (blob: Blob) => {
+  const processIngestion = async (blob: Blob) => {
     setIsProcessing(true);
     setStatus("processing");
-    toast.success("Image Ingested", {
-      description: "Processing document intelligence...",
-      icon: <CheckCircle2 className="text-electric-emerald" />
-    });
     
-    // Story 3.1 placeholder: Send to OCR
-    console.log("Ingested Storage Blob:", blob);
-    
-    // Simulate processing
-    setTimeout(() => {
+    const formData = new FormData();
+    formData.append("image", blob, "capture.jpg");
+
+    try {
+      const response = await fetch("/api/extractions", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("Analysis Complete", {
+          description: `Detected: ${result.data.vendor} - ${result.data.amount}`,
+          icon: <CheckCircle2 className="text-electric-emerald" />
+        });
+        console.log("Extraction Results:", result.data);
+      } else {
+        throw new Error(result.error?.message || "Extraction failed");
+      }
+    } catch (err) {
+      console.error("Ingestion Error:", err);
+      toast.error("Analysis Failed", {
+        description: err instanceof Error ? err.message : "An unexpected error occurred."
+      });
+    } finally {
       setIsProcessing(false);
       setStatus("searching");
-    }, 3000);
+    }
   };
 
   const handleCapture = async () => {

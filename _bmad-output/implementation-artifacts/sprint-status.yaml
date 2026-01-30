@@ -55,7 +55,7 @@ development_status:
   epic-2-retrospective: done
 
   epic-3: in-progress
-  3-1-stateless-ocr-pipeline-implementation: backlog
+  3-1-stateless-ocr-pipeline-implementation: done
   3-2-confidence-threshold-blurry-image-handling: backlog
   3-3-data-reveal-verification-sheet: backlog
   3-4-automated-image-purge-zero-retention: backlog
